@@ -1,18 +1,25 @@
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
-from fastapi.middleware.cors import CORSMiddleware
+import os
+import uuid
+import shutil
 from pathlib import Path
 from datetime import datetime
-from uuid import uuid4
-from urllib.parse import urlparse
+
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+
+from moviepy import VideoFileClip
 
 app = FastAPI(title="ClipForge AI")
 
 BASE_DIR = Path(__file__).resolve().parent
-INDEX_FILE = BASE_DIR / "index.html"
+UPLOAD_DIR = BASE_DIR / "uploads"
+CLIP_DIR = BASE_DIR / "clips"
 
-# Temporary job storage (resets when the server restarts)
+UPLOAD_DIR.mkdir(exist_ok=True)
+CLIP_DIR.mkdir(exist_ok=True)
+
 jobs = []
 
 app.add_middleware(
@@ -24,20 +31,20 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    if not INDEX_FILE.exists():
-        raise HTTPException(status_code=404, detail="index.html not found")
-    return FileResponse(INDEX_FILE)
+    index_file = BASE_DIR / "index.html"
+    if not index_file.exists():
+        raise HTTPException(404, "index.html missing")
+    return FileResponse(index_file)
 
 @app.get("/api/status")
 def status():
     return {
         "app": "ClipForge AI",
         "status": "online",
-        "version": "1.0",
         "features": {
-            "link_input": True,
-            "job_queue": True,
-            "ai_clipping": False,
+            "video_upload": True,
+            "clip_creation": True,
+            "ai_highlight_detection": False,
             "youtube_publishing": False,
             "instagram_publishing": False
         }
@@ -47,49 +54,94 @@ def status():
 def get_jobs():
     return {"jobs": jobs}
 
-@app.post("/api/jobs")
-def create_job(data: dict):
-    video_url = str(data.get("url", "")).strip()
+@app.post("/api/upload")
+async def upload_video(file: UploadFile = File(...)):
+    allowed = {".mp4", ".mov", ".mkv", ".webm"}
+    ext = Path(file.filename or "").suffix.lower()
 
-    if not video_url:
-        raise HTTPException(status_code=400, detail="Video URL is required")
+    if ext not in allowed:
+        raise HTTPException(400, "Unsupported video format")
 
-    parsed = urlparse(video_url)
+    job_id = str(uuid.uuid4())
+    input_path = UPLOAD_DIR / f"{job_id}{ext}"
 
-    if parsed.scheme not in ("http", "https"):
-        raise HTTPException(status_code=400, detail="Invalid URL")
-
-    if not any(host in parsed.netloc.lower() for host in
-               ("youtube.com", "youtu.be")):
-        raise HTTPException(status_code=400, detail="Please use a YouTube URL")
+    with input_path.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
 
     job = {
-        "id": str(uuid4()),
-        "url": video_url,
-        "status": "queued",
+        "id": job_id,
+        "filename": file.filename,
+        "status": "processing",
         "created_at": datetime.now().isoformat(),
-        "schedule": data.get("schedule"),
-        "platforms": data.get("platforms", []),
+        "clips": []
     }
-
     jobs.append(job)
 
-    return {
-        "success": True,
-        "message": "Job added to queue",
-        "job": job
-    }
+    try:
+        with VideoFileClip(str(input_path)) as video:
+            duration = video.duration
 
-@app.delete("/api/jobs/{job_id}")
-def delete_job(job_id: str):
-    for index, job in enumerate(jobs):
-        if job["id"] == job_id:
-            jobs.pop(index)
-            return {"success": True, "message": "Job deleted"}
+            if duration <= 0:
+                raise ValueError("Video has no duration")
 
-    raise HTTPException(status_code=404, detail="Job not found")
+            # Split into up to 3 segments, each at most 30 seconds
+            segment_length = min(30, duration)
+            starts = [0]
+
+            if duration > segment_length:
+                starts.append(max(0, (duration - segment_length) // 2))
+
+            if duration > segment_length * 2:
+                starts.append(max(0, duration - segment_length))
+
+            for i, start in enumerate(starts[:3]):
+                end = min(start + segment_length, duration)
+                segment = video.subclipped(start, end)
+
+                # Convert to portrait format for Shorts/Reels
+                portrait = segment.resized(height=1920)
+
+                if portrait.w >= 1080:
+                    x1 = (portrait.w - 1080) / 2
+                    portrait = portrait.cropped(
+                        x1=x1, y1=0, width=1080, height=1920
+                    )
+
+                output_path = CLIP_DIR / f"{job_id}_clip{i+1}.mp4"
+
+                portrait.write_videofile(
+                    str(output_path),
+                    codec="libx264",
+                    audio_codec="aac",
+                    fps=30,
+                    logger=None
+                )
+
+                job["clips"].append(
+                    f"/clips/{output_path.name}"
+                )
+
+                segment.close()
+                portrait.close()
+
+        job["status"] = "completed"
+
+    except Exception as e:
+        job["status"] = "failed"
+        job["error"] = str(e)
+
+    return job
+
+@app.get("/clips/{filename}")
+def get_clip(filename: str):
+    path = CLIP_DIR / filename
+
+    if not path.exists() or path.parent != CLIP_DIR:
+        raise HTTPException(404, "Clip not found")
+
+    return FileResponse(path, media_type="video/mp4")
 
 @app.get("/health")
 def health():
     return {"status": "healthy"}
-    
+                
