@@ -5,473 +5,187 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClipForge AI</title>
-
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Inter, Arial, sans-serif;
-    background: #080816;
-    color: #fff;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background:
-        radial-gradient(circle at 15% 20%, #762aff30, transparent 35%),
-        radial-gradient(circle at 85% 80%, #00c8ff22, transparent 35%);
-    z-index: -1;
-}
-
-.orb {
-    position: fixed;
-    width: 300px;
-    height: 300px;
-    background: #7b2cff20;
-    filter: blur(100px);
-    border-radius: 50%;
-    animation: float 8s infinite alternate ease-in-out;
-    pointer-events: none;
-}
-
-.orb.one { top: 10%; left: -100px; }
-.orb.two { bottom: 0; right: -100px; background: #00bfff20; }
-
-@keyframes float {
-    from { transform: translateY(-20px); }
-    to { transform: translateY(50px); }
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 7%;
-    border-bottom: 1px solid #ffffff10;
-    backdrop-filter: blur(15px);
-}
-
-.logo {
-    font-size: 23px;
-    font-weight: 800;
-    letter-spacing: -1px;
-}
-
-.logo span {
-    color: #a78bfa;
-}
-
-.status {
-    font-size: 12px;
-    color: #9ca3af;
-    border: 1px solid #ffffff15;
-    padding: 8px 12px;
-    border-radius: 30px;
-}
-
-.status i {
-    display: inline-block;
-    background: #a78bfa;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    margin-right: 6px;
-}
-
-main {
-    max-width: 1100px;
-    margin: auto;
-    padding: 55px 24px;
-}
-
-.hero {
-    text-align: center;
-    margin-bottom: 45px;
-    animation: appear 0.8s ease;
-}
-
-.hero h1 {
-    font-size: clamp(32px, 6vw, 56px);
-    letter-spacing: -2px;
-    margin-bottom: 14px;
-}
-
-.gradient {
-    background: linear-gradient(90deg, #a78bfa, #5ee7ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.hero p {
-    color: #9ca3af;
-    font-size: 15px;
-    line-height: 1.7;
-}
-
-@keyframes appear {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.card {
-    background: #111124b8;
-    border: 1px solid #ffffff12;
-    border-radius: 22px;
-    padding: 28px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 20px 70px #00000020;
-    transition: transform 0.3s, border 0.3s;
-}
-
-.card:hover {
-    border-color: #a78bfa55;
-    transform: translateY(-3px);
-}
-
-.card h2 {
-    font-size: 19px;
-    margin-bottom: 10px;
-}
-
-.sub {
-    color: #9696b0;
-    font-size: 13px;
-    margin-bottom: 23px;
-    line-height: 1.6;
-}
-
-.input-box {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-input {
-    flex: 1;
-    min-width: 180px;
-    padding: 16px;
-    border: 1px solid #ffffff15;
-    border-radius: 12px;
-    background: #080816;
-    color: white;
-    outline: none;
-}
-
-input:focus {
-    border-color: #a78bfa;
-    box-shadow: 0 0 15px #a78bfa20;
-}
-
-button {
-    border: none;
-    border-radius: 12px;
-    padding: 15px 22px;
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.25s;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 25px #8b5cf640;
-}
-
-button:active {
-    transform: scale(.97);
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin-top: 25px;
-}
-
-.stat {
-    text-align: center;
-}
-
-.stat .number {
-    font-size: 30px;
-    font-weight: 800;
-    margin: 12px 0;
-}
-
-.stat p {
-    color: #9696b0;
-    font-size: 13px;
-}
-
-.icon {
-    font-size: 25px;
-}
-
-.section {
-    margin-top: 25px;
-}
-
-.platforms {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.platform {
-    flex: 1;
-    min-width: 130px;
-    background: #090919;
-    border: 1px solid #ffffff12;
-    border-radius: 14px;
-    padding: 18px;
-    text-align: center;
-}
-
-.platform p {
-    font-size: 13px;
-    color: #a1a1b5;
-    margin-top: 8px;
-}
-
-.schedule {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-top: 18px;
-}
-
-.schedule input {
-    width: 100%;
-}
-
-.message {
-    margin-top: 15px;
-    font-size: 13px;
-    color: #a78bfa;
-    word-break: break-word;
-}
-
-footer {
-    text-align: center;
-    padding: 35px 20px;
-    color: #65657f;
-    font-size: 12px;
-}
-
-@media (max-width: 650px) {
-    header { padding: 20px; }
-    main { padding: 35px 16px; }
-    .card { padding: 20px; }
-    .grid { grid-template-columns: 1fr; }
-    .schedule { grid-template-columns: 1fr; }
-    .hero h1 { letter-spacing: -1px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-    }
-}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#080816;color:white;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 15% 20%,#762aff35,transparent 35%),radial-gradient(circle at 85% 80%,#00c8ff25,transparent 35%)}
+.orb{position:fixed;width:280px;height:280px;border-radius:50%;filter:blur(100px);background:#762aff30;z-index:-1;animation:float 8s infinite alternate}
+.orb.one{top:5%;left:-100px}.orb.two{bottom:0;right:-100px;background:#00bfff25}
+@keyframes float{to{transform:translateY(60px)}}
+header{padding:22px 7%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff15;backdrop-filter:blur(15px)}
+.logo{font-size:23px;font-weight:800}.logo span{color:#a78bfa}
+.status{font-size:12px;color:#b5b5ca;border:1px solid #ffffff20;padding:9px 13px;border-radius:30px}
+main{max-width:950px;margin:auto;padding:45px 20px}
+.hero{text-align:center;margin-bottom:35px;animation:appear .7s ease}
+h1{font-size:clamp(32px,6vw,52px);margin-bottom:12px}
+.gradient{background:linear-gradient(90deg,#a78bfa,#5ee7ff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.hero p,.muted{color:#a1a1b5;line-height:1.7}
+.card{background:#111124d9;border:1px solid #ffffff16;border-radius:20px;padding:25px;margin-bottom:20px;backdrop-filter:blur(18px);box-shadow:0 15px 50px #0003;animation:appear .7s ease}
+h2{font-size:19px;margin-bottom:10px}
+.muted{font-size:13px;margin-bottom:20px}
+.upload{border:2px dashed #8064c8;border-radius:16px;padding:30px 15px;text-align:center;background:#17142a;cursor:pointer}
+.upload:hover{border-color:#b69aff;background:#201a38}
+.upload .emoji{font-size:35px;margin-bottom:12px}
+input[type=file]{display:none}
+button{border:0;border-radius:12px;padding:14px 20px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:white;font-weight:bold;cursor:pointer;font-size:14px;transition:.2s}
+button:hover{transform:translateY(-2px);box-shadow:0 5px 20px #8b5cf655}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.primary{width:100%;margin-top:18px}
+#fileName{color:#c4b5fd;font-size:13px;margin-top:12px;overflow-wrap:anywhere}
+#message{margin-top:17px;font-size:14px;color:#c4b5fd;line-height:1.6;overflow-wrap:anywhere}
+.progress{height:7px;background:#29243d;border-radius:10px;margin-top:15px;overflow:hidden;display:none}
+.progress div{height:100%;width:35%;background:linear-gradient(90deg,#8b5cf6,#5ee7ff);animation:loading 1.2s infinite alternate}
+@keyframes loading{to{width:95%}}
+.clip{padding:15px;background:#090919;border:1px solid #ffffff15;border-radius:13px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.clip a{color:#c4b5fd;text-decoration:none;font-size:13px;font-weight:bold}
+.clip a:hover{text-decoration:underline}
+.info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.info div{background:#090919;padding:18px;border:1px solid #ffffff12;border-radius:14px;text-align:center}
+.info strong{display:block;font-size:20px;margin-bottom:7px}
+.info span{font-size:12px;color:#a1a1b5}
+footer{text-align:center;color:#696981;font-size:12px;padding:25px}
+@keyframes appear{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){header{padding:18px}.card{padding:19px}.info{grid-template-columns:1fr}.clip{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
-
 <body>
-
-<div class="orb one"></div>
-<div class="orb two"></div>
+<div class="orb one"></div><div class="orb two"></div>
 
 <header>
-    <div class="logo">ClipForge <span>AI.</span></div>
-    <div class="status"><i></i> AI WORKSPACE</div>
+  <div class="logo">ClipForge <span>AI.</span></div>
+  <div class="status">● VIDEO STUDIO</div>
 </header>
 
 <main>
+  <section class="hero">
+    <h1>Make videos <span class="gradient">short & powerful.</span></h1>
+    <p>Upload your video. Create vertical clips. Download and share.</p>
+  </section>
 
-    <section class="hero">
-        <h1>Turn videos into <span class="gradient">viral clips.</span></h1>
-        <p>One link. Endless content possibilities.<br>
-        Your next short-form video starts here.</p>
-    </section>
+  <section class="card">
+    <h2>🎬 Create your clips</h2>
+    <p class="muted">Upload an MP4, MOV, MKV or WEBM video that you own or have permission to edit. ClipForge will create up to 3 segments.</p>
 
-    <section class="card">
-        <h2>🎬 Create your clips</h2>
-        <p class="sub">
-            Paste your YouTube link to get started.
-            Use videos you own or have permission to edit.
-        </p>
+    <label class="upload" for="videoFile">
+      <div class="emoji">☁️</div>
+      <strong>Choose your video</strong>
+      <p class="muted" style="margin:8px 0 0">Tap here to select a file from your phone</p>
+    </label>
 
-        <div class="input-box">
-            <input type="url" id="videoLink"
-                   placeholder="Paste your YouTube video link here...">
-            <button onclick="startProcessing()">✨ Start Creating</button>
-        </div>
+    <input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/x-matroska,video/webm">
+    <div id="fileName">No video selected</div>
 
-        <div id="message" class="message"></div>
-    </section>
+    <button class="primary" id="createBtn" onclick="createClips()">✨ Create Clips</button>
+    <div class="progress" id="progress"><div></div></div>
+    <div id="message" role="status"></div>
+  </section>
 
-    <section class="grid">
-        <div class="card stat">
-            <div class="icon">🎞️</div>
-            <div class="number">AI Clips</div>
-            <p>Smart short-form content</p>
-        </div>
+  <section class="card">
+    <h2>📂 Your finished clips</h2>
+    <p class="muted">Your generated clips will appear here with download links.</p>
+    <div id="clips">
+      <p class="muted">No clips created yet.</p>
+    </div>
+  </section>
 
-        <div class="card stat">
-            <div class="icon">⚡</div>
-            <div class="number">Fast Workflow</div>
-            <p>Less manual editing</p>
-        </div>
-
-        <div class="card stat">
-            <div class="icon">📅</div>
-            <div class="number">Auto Schedule</div>
-            <p>Plan your publishing</p>
-        </div>
-    </section>
-
-    <section class="card section">
-        <h2>📱 Publishing destinations</h2>
-        <p class="sub">Your content workflow dashboard</p>
-
-        <div class="platforms">
-            <div class="platform">
-                <div class="icon">▶️</div>
-                <strong>YouTube</strong>
-                <p>Shorts</p>
-            </div>
-
-            <div class="platform">
-                <div class="icon">📸</div>
-                <strong>Instagram</strong>
-                <p>Reels</p>
-            </div>
-
-            <div class="platform">
-                <div class="icon">🤖</div>
-                <strong>AI Studio</strong>
-                <p>Clip workflow</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="card section">
-        <h2>🗓️ Content scheduler</h2>
-        <p class="sub">Plan when you want your content published.</p>
-
-        <div class="schedule">
-            <input type="date" id="scheduleDate">
-            <input type="time" id="scheduleTime">
-        </div>
-
-        <button style="margin-top:15px;width:100%"
-                onclick="schedulePost()">
-            📅 Schedule Content
-        </button>
-
-        <div id="scheduleMessage" class="message"></div>
-    </section>
-
+  <section class="card">
+    <h2>⚡ ClipForge workspace</h2>
+    <div class="info">
+      <div><strong>3</strong><span>Maximum clips per upload</span></div>
+      <div><strong>9:16</strong><span>Vertical video format</span></div>
+      <div><strong>MP4</strong><span>Output format</span></div>
+    </div>
+  </section>
 </main>
 
-<footer>
-    ClipForge AI · Create something amazing ✨
-</footer>
+<footer>ClipForge AI · Create something amazing ✨</footer>
 
 <script>
-async function startProcessing() {
-    const link = document.getElementById("videoLink").value.trim();
-    const message = document.getElementById("message");
+const fileInput = document.getElementById("videoFile");
+const fileName = document.getElementById("fileName");
+const message = document.getElementById("message");
+const createBtn = document.getElementById("createBtn");
+const progress = document.getElementById("progress");
+const clipsBox = document.getElementById("clips");
 
-    if (!link) {
-        message.textContent = "Please paste a YouTube link first.";
-        return;
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  fileName.textContent = file ? "Selected: " + file.name : "No video selected";
+  message.textContent = "";
+});
+
+async function createClips() {
+  const file = fileInput.files[0];
+
+  if (!file) {
+    message.textContent = "Please choose a video first.";
+    return;
+  }
+
+  const allowed = [".mp4", ".mov", ".mkv", ".webm"];
+  const extension = "." + file.name.split(".").pop().toLowerCase();
+
+  if (!allowed.includes(extension)) {
+    message.textContent = "Please choose an MP4, MOV, MKV or WEBM file.";
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  createBtn.disabled = true;
+  progress.style.display = "block";
+  message.textContent = "Uploading and processing your video. This may take a while...";
+  clipsBox.innerHTML = "";
+
+  try {
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.detail || "Upload failed");
     }
 
-    message.textContent = "Sending your video to ClipForge AI...";
-
-    try {
-        const response = await fetch("/api/jobs", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                url: link,
-                platforms: ["youtube", "instagram"]
-            })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.detail || "Something went wrong");
-        }
-
-        message.textContent =
-            "Success! Your video has been added to the ClipForge queue. Job ID: " +
-            result.job.id;
-
-    } catch (error) {
-        message.textContent = "Error: " + error.message;
-    }
-}
-    const link = document.getElementById("videoLink").value.trim();
-    const message = document.getElementById("message");
-
-    if (!link) {
-        message.textContent = "Please paste a video link first.";
-        return;
+    if (result.status !== "completed") {
+      throw new Error(result.error || "Video processing failed");
     }
 
-    try {
-        const url = new URL(link);
-        if (!url.hostname.includes("youtube.com") &&
-            !url.hostname.includes("youtu.be")) {
-            message.textContent = "Please enter a valid YouTube link.";
-            return;
-        }
-    } catch {
-        message.textContent = "Please enter a valid video URL.";
-        return;
+    message.textContent = "🎉 Your clips are ready!";
+    clipsBox.innerHTML = "";
+
+    if (!result.clips || result.clips.length === 0) {
+      clipsBox.textContent = "No clips were generated.";
+    } else {
+      result.clips.forEach((clip, index) => {
+        const row = document.createElement("div");
+        row.className = "clip";
+
+        const label = document.createElement("strong");
+        label.textContent = "🎞️ Clip " + (index + 1);
+
+        const link = document.createElement("a");
+        link.href = clip;
+        link.textContent = "⬇ Download clip";
+        link.download = "";
+
+        row.append(label, link);
+        clipsBox.appendChild(row);
+      });
     }
 
-    message.textContent =
-        "Link received! AI clipping and publishing services still need to be connected to the backend.";
-}
-
-function schedulePost() {
-    const date = document.getElementById("scheduleDate").value;
-    const time = document.getElementById("scheduleTime").value;
-    const message = document.getElementById("scheduleMessage");
-
-    if (!date || !time) {
-        message.textContent = "Please choose a date and time.";
-        return;
-    }
-
-    const chosen = new Date(date + "T" + time);
-
-    if (chosen < new Date()) {
-        message.textContent = "Please select a future date and time.";
-        return;
-    }
-
-    message.textContent =
-        "Schedule preview created for " + date + " at " + time +
-        ". Automatic publishing is not connected yet.";
+  } catch (error) {
+    message.textContent = "❌ " + error.message;
+    clipsBox.innerHTML = '<p class="muted">No finished clips yet.</p>';
+  } finally {
+    createBtn.disabled = false;
+    progress.style.display = "none";
+  }
 }
 </script>
-
 </body>
 </html>
