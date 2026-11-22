@@ -389,7 +389,43 @@ footer {
 </footer>
 
 <script>
-function startProcessing() {
+async function startProcessing() {
+    const link = document.getElementById("videoLink").value.trim();
+    const message = document.getElementById("message");
+
+    if (!link) {
+        message.textContent = "Please paste a YouTube link first.";
+        return;
+    }
+
+    message.textContent = "Sending your video to ClipForge AI...";
+
+    try {
+        const response = await fetch("/api/jobs", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: link,
+                platforms: ["youtube", "instagram"]
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.detail || "Something went wrong");
+        }
+
+        message.textContent =
+            "Success! Your video has been added to the ClipForge queue. Job ID: " +
+            result.job.id;
+
+    } catch (error) {
+        message.textContent = "Error: " + error.message;
+    }
+}
     const link = document.getElementById("videoLink").value.trim();
     const message = document.getElementById("message");
 
