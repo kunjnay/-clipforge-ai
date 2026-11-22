@@ -9,10 +9,13 @@ UPLOADS=BASE/'uploads'; OUTPUTS=BASE/'clips'; DATA=BASE/'data'
 for p in (UPLOADS,OUTPUTS,DATA): p.mkdir(exist_ok=True)
 app=FastAPI(title='ClipForge AI')
 app.mount('/clips', StaticFiles(directory=str(OUTPUTS)), name='clips')
-app.mount('/static', StaticFiles(directory=str(BASE/'static')), name='static')
 
 @app.get('/', response_class=HTMLResponse)
-def home(): return (BASE/'static'/'index.html').read_text()
+def home():
+    html_path = BASE/'index.html'
+    if not html_path.exists():
+        raise HTTPException(500, 'index.html is missing from the project root.')
+    return html_path.read_text(encoding='utf-8')
 @app.get('/api/status')
 def status():
     return {'ffmpeg':shutil.which('ffmpeg') is not None,'clips':len(list(OUTPUTS.glob('*.mp4'))),'ai_configured':bool(os.getenv('OPENAI_API_KEY'))}
@@ -65,3 +68,4 @@ def get_schedule():
 def delete_schedule(item_id:str):
     p=DATA/'schedule.json'; entries=json.loads(p.read_text()) if p.exists() else []
     updated=[x for x in entries if x['id']!=item_id]; p.write_text(json.dumps(updated,indent=2)); return {'deleted':len(updated)!=len(entries)}
+    
