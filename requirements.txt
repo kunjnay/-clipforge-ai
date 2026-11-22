@@ -1,0 +1,12 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+python-multipart==0.0.20
+python-dotenv>=1.0.1,<2.0
+yt-dlp>=2025.11.12
+faster-whisper>=1.1.1,<2.0
+requests>=2.32.3,<3.0
+cryptography>=44.0.2,<47.0
+# Optional official YouTube auto-publishing support (no paid ClipForge API):
+google-api-python-client>=2.165.0,<3.0
+google-auth>=2.38.0,<3.0
+google-auth-oauthlib>=1.2.2,<2.0
